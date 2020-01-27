@@ -93,10 +93,10 @@ void OLED_DrawBMP(unsigned char x0, unsigned char y0,unsigned char x1, unsigned 
 void Delay_50ms(unsigned int Del_50ms);
 void Delay_1ms(unsigned int Del_1ms);
 void fill_picture(unsigned char fill_Data);
-void Picture();
+void Picture(void);
 void display_graphic_16x16(int page,int column,const char *dp);
 void lcd_address(char page,char column);
-void IIC_Wait_Ack();
+void IIC_Wait_Ack(void);
 
 
 

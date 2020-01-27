@@ -59,8 +59,8 @@ void Gps_Msg_Show(void)
 int main(void)
 {	 
 	u16 i,rxlen;
-	u16 lenx;
-	u8 key=0XFF;
+//	u16 lenx;
+//	u8 key=0XFF;
 	u8 upload=0;	    
 	delay_init();	    	 //延时函数初始化	  
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
