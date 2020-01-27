@@ -403,6 +403,11 @@
           <GroupName>CORE</GroupName>
           <Files>
             <File>
+              <FileName>usart3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\USART3\usart3.c</FilePath>
+            </File>
+            <File>
               <FileName>core_cm3.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\CORE\core_cm3.c</FilePath>
@@ -438,14 +443,9 @@
               <FilePath>..\HARDWARE\TIMER\timer.c</FilePath>
             </File>
             <File>
-              <FileName>usart3.c</FileName>
+              <FileName>oled.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HARDWARE\USART3\usart3.c</FilePath>
-            </File>
-            <File>
-              <FileName>LCD_ZK.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\8oled\LCD_ZK.c</FilePath>
+              <FilePath>..\HARDWARE\OLED\oled.c</FilePath>
             </File>
           </Files>
         </Group>

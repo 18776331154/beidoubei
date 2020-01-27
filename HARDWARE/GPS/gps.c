@@ -304,7 +304,7 @@ u8 SkyTra_Cfg_Ack_Check(void)
 //返回值:0,执行成功;其他,执行失败(这里不会返回0了)
 u8 SkyTra_Cfg_Prt(u8 baud_id)
 {
-	SkyTra_baudrate *cfg_prt=(SkyTra_baudrate *)USART3_TX_BUF;
+	SkyTra_baudrate *cfg_prt=(SkyTra_baudrate *)USART3_RX_BUF;
 	cfg_prt->sos=0XA1A0;		//引导序列(小端模式)
 	cfg_prt->PL=0X0400;			//有效数据长度(小端模式)
 	cfg_prt->id=0X05;		    //配置波特率的ID 
@@ -315,7 +315,7 @@ u8 SkyTra_Cfg_Prt(u8 baud_id)
 	cfg_prt->end=0X0A0D;        //发送结束符(小端模式)
 	SkyTra_Send_Date((u8*)cfg_prt,sizeof(SkyTra_baudrate));//发送数据给SkyTra   
 	delay_ms(200);				//等待发送完成 
-	usart3_init(BAUD_id[baud_id]);	//重新初始化串口3  
+//	usart3_init(BAUD_id[baud_id]);	//重新初始化串口3  
 	return SkyTra_Cfg_Ack_Check();//这里不会反回0,因为UBLOX发回来的应答在串口重新初始化的时候已经被丢弃了.
 } 
 //配置SkyTra_GPS模块的时钟脉冲宽度
@@ -324,7 +324,7 @@ u8 SkyTra_Cfg_Prt(u8 baud_id)
 u8 SkyTra_Cfg_Tp(u32 width)
 {
 	u32 temp=width;
-	SkyTra_pps_width *cfg_tp=(SkyTra_pps_width *)USART3_TX_BUF;
+	SkyTra_pps_width *cfg_tp=(SkyTra_pps_width *)USART3_RX_BUF;
 	temp=(width>>24)|((width>>8)&0X0000FF00)|((width<<8)&0X00FF0000)|((width<<24)&0XFF000000);//小端模式
 	cfg_tp->sos=0XA1A0;		    //cfg header(小端模式)
 	cfg_tp->PL=0X0700;        //有效数据长度(小端模式)
@@ -342,7 +342,7 @@ u8 SkyTra_Cfg_Tp(u32 width)
 //返回值:0,发送成功;其他,发送失败.
 u8 SkyTra_Cfg_Rate(u8 Frep)
 {
-	SkyTra_PosRate *cfg_rate=(SkyTra_PosRate *)USART3_TX_BUF;
+	SkyTra_PosRate *cfg_rate=(SkyTra_PosRate *)USART3_RX_BUF;
  	cfg_rate->sos=0XA1A0;	    //cfg header(小端模式)
 	cfg_rate->PL=0X0300;			//有效数据长度(小端模式)
 	cfg_rate->id=0X0E;	      //cfg rate id

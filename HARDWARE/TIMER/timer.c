@@ -16,13 +16,13 @@
 extern vu16 USART3_RX_STA;
 
 //定时器7中断服务程序		    
-void TIM7_IRQHandler(void)
+void TIM3_IRQHandler(void)
 { 	
-	if (TIM_GetITStatus(TIM7, TIM_IT_Update) != RESET)//是更新中断
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)//是更新中断
 	{	 			   
 		USART3_RX_STA|=1<<15;	//标记接收完成
-		TIM_ClearITPendingBit(TIM7, TIM_IT_Update  );  //清除TIM7更新中断标志    
-		TIM_Cmd(TIM7, DISABLE);  //关闭TIM7 
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update  );  //清除TIM7更新中断标志    
+		TIM_Cmd(TIM3, DISABLE);  //关闭TIM7 
 	}	    
 }
  
