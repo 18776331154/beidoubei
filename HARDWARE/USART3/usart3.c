@@ -111,20 +111,20 @@ void usart3_init(u32 bound)
 
 //串口3,printf 函数
 //确保一次发送数据不超过USART3_MAX_SEND_LEN字节
-void u3_printf(char* fmt,...)  
-{  
-	u16 i,j; 
-	va_list ap; 
-	va_start(ap,fmt);
-	vsprintf((char*)USART3_TX_BUF,fmt,ap);
-	va_end(ap);
-	i=strlen((const char*)USART3_TX_BUF);		//此次发送数据的长度
-	for(j=0;j<i;j++)							//循环发送数据
-	{
-	  while(USART_GetFlagStatus(USART3,USART_FLAG_TC)==RESET); //循环发送,直到发送完毕   
-		USART_SendData(USART3,USART3_TX_BUF[j]); 
-	} 
-}
+//void u3_printf(char* fmt,...)  
+//{  
+//	u16 i,j; 
+//	va_list ap; 
+//	va_start(ap,fmt);
+//	vsprintf((char*)USART3_TX_BUF,fmt,ap);
+//	va_end(ap);
+//	i=strlen((const char*)USART3_TX_BUF);		//此次发送数据的长度
+//	for(j=0;j<i;j++)							//循环发送数据
+//	{
+//	  while(USART_GetFlagStatus(USART3,USART_FLAG_TC)==RESET); //循环发送,直到发送完毕   
+//		USART_SendData(USART3,USART3_TX_BUF[j]); 
+//	} 
+//}
 
  
 

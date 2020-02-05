@@ -1,7 +1,7 @@
 #include "gps.h" 
 #include "led.h" 
 #include "delay.h" 								   
-#include "usart3.h" 								   
+#include "usart.h" 								   
 #include "stdio.h"	 
 #include "stdarg.h"	 
 #include "string.h"	 
@@ -161,7 +161,7 @@ void NMEA_GNGGA_Analysis(nmea_msg *gpsx,u8 *buf)
 {
 	u8 *p1,dx;			 
 	u8 posx;    
-	p1=(u8*)strstr((const char *)buf,"$GNGGA");
+	p1=(u8*)strstr((const char *)buf,"$GNGGA");//地址
 	posx=NMEA_Comma_Pos(p1,6);								//得到GPS状态
 	if(posx!=0XFF)gpsx->gpssta=NMEA_Str2num(p1+posx,&dx);	
 	posx=NMEA_Comma_Pos(p1,7);								//得到用于定位的卫星数
@@ -277,18 +277,18 @@ u8 SkyTra_Cfg_Ack_Check(void)
 {			 
 	u16 len=0,i;
 	u8 rval=0;
-	while((USART3_RX_STA&0X8000)==0 && len<100)//等待接收到应答   
+	while((USART_RX_STA&0X8000)==0 && len<100)//等待接收到应答   
 	{
 		len++;
 		delay_ms(5);
 	}		 
 	if(len<100)   	//超时错误.
 	{
-		len=USART3_RX_STA&0X7FFF;	//此次接收到的数据长度 
+		len=USART_RX_STA&0X7FFF;	//此次接收到的数据长度 
 		for(i=0;i<len;i++)
 		{
-			if(USART3_RX_BUF[i]==0X83)break;
-			else if(USART3_RX_BUF[i]==0X84)
+			if(USART1_RX_BUF[i]==0X83)break;
+			else if(USART1_RX_BUF[i]==0X84)
 			{
 				rval=3;
 				break;
@@ -296,7 +296,7 @@ u8 SkyTra_Cfg_Ack_Check(void)
 		}
 		if(i==len)rval=2;						//没有找到同步字符
 	}else rval=1;								//接收超时错误
-    USART3_RX_STA=0;							//清除接收
+    USART_RX_STA=0;							//清除接收
 	return rval;  
 }
 //配置SkyTra_GPS/北斗模块波特率
@@ -304,7 +304,7 @@ u8 SkyTra_Cfg_Ack_Check(void)
 //返回值:0,执行成功;其他,执行失败(这里不会返回0了)
 u8 SkyTra_Cfg_Prt(u8 baud_id)
 {
-	SkyTra_baudrate *cfg_prt=(SkyTra_baudrate *)USART3_RX_BUF;
+	SkyTra_baudrate *cfg_prt=(SkyTra_baudrate *)USART1_RX_BUF;
 	cfg_prt->sos=0XA1A0;		//引导序列(小端模式)
 	cfg_prt->PL=0X0400;			//有效数据长度(小端模式)
 	cfg_prt->id=0X05;		    //配置波特率的ID 
@@ -324,7 +324,7 @@ u8 SkyTra_Cfg_Prt(u8 baud_id)
 u8 SkyTra_Cfg_Tp(u32 width)
 {
 	u32 temp=width;
-	SkyTra_pps_width *cfg_tp=(SkyTra_pps_width *)USART3_RX_BUF;
+	SkyTra_pps_width *cfg_tp=(SkyTra_pps_width *)USART1_RX_BUF;
 	temp=(width>>24)|((width>>8)&0X0000FF00)|((width<<8)&0X00FF0000)|((width<<24)&0XFF000000);//小端模式
 	cfg_tp->sos=0XA1A0;		    //cfg header(小端模式)
 	cfg_tp->PL=0X0700;        //有效数据长度(小端模式)
@@ -342,7 +342,7 @@ u8 SkyTra_Cfg_Tp(u32 width)
 //返回值:0,发送成功;其他,发送失败.
 u8 SkyTra_Cfg_Rate(u8 Frep)
 {
-	SkyTra_PosRate *cfg_rate=(SkyTra_PosRate *)USART3_RX_BUF;
+	SkyTra_PosRate *cfg_rate=(SkyTra_PosRate *)USART1_RX_BUF;
  	cfg_rate->sos=0XA1A0;	    //cfg header(小端模式)
 	cfg_rate->PL=0X0300;			//有效数据长度(小端模式)
 	cfg_rate->id=0X0E;	      //cfg rate id
@@ -361,8 +361,8 @@ void SkyTra_Send_Date(u8* dbuf,u16 len)
 	u16 j;
 	for(j=0;j<len;j++)//循环发送数据
 	{
-		while((USART3->SR&0X40)==0);//循环发送,直到发送完毕   
-		USART3->DR=dbuf[j];  
+		while((USART1->SR&0X40)==0);//循环发送,直到发送完毕   
+		USART1->DR=dbuf[j];  
 	}	
 }
 

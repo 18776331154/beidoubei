@@ -14,7 +14,7 @@
 //技术支持：www.openedv.com
 //广州市星翼电子科技有限公司  
 
-u8 USART1_TX_BUF[250]; 					//串口1,发送缓存区
+u8 USART_TX_BUF[250]; 					//串口1,发送缓存区
 nmea_msg gpsx; 											//GPS信息
 __align(4) u8 dtbuf[50];   								//打印缓存器
 const u8*fixmode_tbl[4]={"Fail","Fail"," 2D "," 3D "};	//fix mode字符串 
@@ -58,17 +58,18 @@ void Gps_Msg_Show(void)
 }
 int main(void)
 {	 
-	u16 i,rxlen;
-//	u16 lenx;
-//	u8 key=0XFF;
-	u8 upload=0;	    
-	delay_init();	    	 //延时函数初始化	  
+	 u16 i,rxlen;
+//	u8 upload=0;	
+	 float num;
+   float num1;
+	 char b;
+
+	delay_init();	    	 //延时函数初始化	 
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
 	uart_init(115200);	 	//串口初始化为115200
-	
 	initial_lcd();	
   OLED_Clear(); //clear all dots 
- 	usmart_dev.init(72);		//初始化USMART		
+	
 // 	LED_Init();		  			//初始化与LED连接的硬件接口
 //	KEY_Init();					//初始化按键
 //	LCD_Init();			   		//初始化LCD   
@@ -102,24 +103,32 @@ int main(void)
 	while(1) 
 	{	
 
-//	display_string_5x7(5,1,"Ltd. established at  ");/*显示一串5x7点阵的ASCII字*/	
-//OLED_ShowString(0,0,dtbuf,16);
+  
 
-//		delay_ms(1);
-		if(USART_RX_STA&0X8000)		//接收到一次数据了
+	
+
+		if(USART_RX_STA&0x8000)		//接收到一次数据了
 		{
 			rxlen=USART_RX_STA&0X7FFF;	//得到数据长度
 			for(i=0;i<rxlen;i++)
-			USART1_TX_BUF[i]=USART_RX_BUF[i];	
+			USART_TX_BUF[i]=USART1_RX_BUF[i];	
+				OLED_ShowString(18,2,"66",16);
+ 			USART_RX_STA=0;//启动下一次接收
+			USART_TX_BUF[i]=0;			//自动添加结束符
+	    GPS_Analysis(&gpsx,(u8*)USART_TX_BUF);//分析字符串
+//			Gps_Msg_Show();				//显示信息	
+			OLED_ShowString(18,2,"66",16);
+		
 			
- 				   	//启动下一次接收
-			USART1_TX_BUF[i]=0;			//自动添加结束符
-			GPS_Analysis(&gpsx,(u8*)USART1_TX_BUF);//分析字符串
-			Gps_Msg_Show();				//显示信息	
-			if(upload)printf("\r\n%s\r\n",USART1_TX_BUF);//发送接收到的数据到串口1
-			USART_RX_STA=0;//启动下一次接收
+//			if(upload)printf("\r\n%s\r\n",USART1_TX_BUF);//发送接收到的数据到串口1
+			
  		}
-//		key=KEY_Scan(0);
+//		
+//	len=USART_RX_STA&0x3fff;//得到此次接收到的数据长度
+
+	
+			
+//						USART_RX_STA=0;	key=KEY_Scan(0);
 //		if(key==KEY0_PRES)
 //		{
 //			upload=!upload;
