@@ -5,7 +5,7 @@
 #include "lcd.h"
 #include "usmart.h"		 	 
 #include "gps.h"	
-//#include "usart3.h" 	
+#include "usart3.h" 	
 #include "key.h" 	 
 #include "string.h"	
 #include "oled.h"
@@ -27,7 +27,7 @@ void Gps_Msg_Show(void)
 	tp=gpsx.longitude;	   
 	sprintf((char *)dtbuf,"Longitude:%.5f %1c   ",tp/=100000,gpsx.ewhemi);	//得到经度字符串
  //	LCD_ShowString(30,120,200,16,16,dtbuf);	
-	OLED_ShowString(18,2,"66",16);
+	OLED_ShowString(18,2,dtbuf,16);
 	tp=gpsx.latitude;	   
 	sprintf((char *)dtbuf,"Latitude:%.5f %1c   ",tp/=100000,gpsx.nshemi);	//得到纬度字符串
 // 	LCD_ShowString(30,140,200,16,16,dtbuf);	 
@@ -56,50 +56,44 @@ void Gps_Msg_Show(void)
 	sprintf((char *)dtbuf,"UTC Time:%02d:%02d:%02d   ",gpsx.utc.hour,gpsx.utc.min,gpsx.utc.sec);	//显示UTC时间
 //  LCD_ShowString(30,300,200,16,16,dtbuf);		  	  
 }
+u8 key=0;
+u8 a=0;
 int main(void)
 {	 
-	 u16 i,rxlen;
-//	u8 upload=0;	
+	 u16 i,rxlen;	
 	 float num;
    float num1;
 	 char b;
-
 	delay_init();	    	 //延时函数初始化	 
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
-	uart_init(115200);	 	//串口初始化为115200
-	initial_lcd();	
+	uart_init(38400);	 	//串口初始化为115200
+//	initial_lcd();	
   OLED_Clear(); //clear all dots 
 	
-// 	LED_Init();		  			//初始化与LED连接的硬件接口
-//	KEY_Init();					//初始化按键
-//	LCD_Init();			   		//初始化LCD   
-//	Usart2_Init(38400);		//初始化串口3 
-//	POINT_COLOR=RED;
-//	display_string_5x7(5,1,dtbuf);/*显示一串5x7点阵的ASCII字*/	
-//	LCD_ShowString(30,20,200,16,16,"ALIENTEK STM32F1 ^_^");	  
-//	LCD_ShowString(30,40,200,16,16,"S1216F8 GPS TEST");	
-//	LCD_ShowString(30,60,200,16,16,"ATOM@ALIENTEK");
-//	LCD_ShowString(30,80,200,16,16,"KEY0:Upload NMEA Data SW");   	 										   	   
-//  LCD_ShowString(30,100,200,16,16,"NMEA Data Upload:OFF"); 
+ 	LED_Init();		  			//初始化与LED连接的硬件接口
+
+ 
+	
+
 		
-//	if(SkyTra_Cfg_Rate(5)!=0)	//设置定位信息更新速度为5Hz,顺便判断GPS模块是否在位. 
-//	{
-////   	LCD_ShowString(30,120,200,16,16,"SkyTraF8-BD Setting...");
-//		OLED_ShowString(0,0,"SkyTraF8-BD Setting...",16);
+	if(SkyTra_Cfg_Rate(5)!=0)	//设置定位信息更新速度为5Hz,顺便判断GPS模块是否在位. 
+	{
+    a++;
+		OLED_ShowString(0,0,"SkyTraF8-BD Setting...",16);
+
 		
 		
-		
-//		do
-//		{
-//			usart3_init(9600);			//初始化串口3波特率为9600
-//	  	SkyTra_Cfg_Prt(3);			//重新设置模块的波特率为38400
-//			usart3_init(38400);			//初始化串口3波特率为38400
-//      key=SkyTra_Cfg_Tp(100000);	//脉冲宽度为100ms
-//		}while(SkyTra_Cfg_Rate(5)!=0&&key!=0);//配置SkyTraF8-BD的更新速率为5Hz
-////	  LCD_ShowString(30,120,200,16,16,"SkyTraF8-BD Set Done!!");
-//		delay_ms(500);
-////		LCD_Fill(30,120,30+200,120+16,WHITE);//清除显示 
-//	}
+		do
+		{
+			usart3_init(9600);		
+	  	SkyTra_Cfg_Prt(3);			//重新设置模块的波特率为38400
+			uart_init(38400);	 	//串口初始化为115200
+      key=SkyTra_Cfg_Tp(100000);	//脉冲宽度为100ms
+		}while(SkyTra_Cfg_Rate(5)!=0&&key!=0);//配置SkyTraF8-BD的更新速率为5Hz
+    OLED_ShowString(0,2,"SkyTraF8-BD Set Done!!",16);
+		delay_ms(500);
+
+	}
 	while(1) 
 	{	
 

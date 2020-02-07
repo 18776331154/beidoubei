@@ -169,8 +169,8 @@ void uart_init(u32 bound){
 	
 	
 	TIM3_Int_Init(1000-1,7200-1);		//10ms中断
-	USART_RX_STA=0;		//清零
-	TIM_Cmd(TIM3,DISABLE);			//关闭定时器7
+	USART_RX_STA=0;		//清零,因为定时器初始化的时候进了一次定时器中断服务函数，不清零的话会进死循环里的if
+	TIM_Cmd(TIM3,DISABLE);			//关闭定时器，不关闭的话假如10ms之内没有收到串口数据，从而会进入定时器中断服务函数，会进死循环里的if
 
 
 }
