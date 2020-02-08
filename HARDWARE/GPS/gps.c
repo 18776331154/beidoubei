@@ -56,17 +56,17 @@ int NMEA_Str2num(u8 *buf,u8*dx)
 	int res;
 	while(1) //得到整数和小数的长度
 	{
-		if(*p=='-'){mask|=0X02;p++;}//是负数
+		if(*p=='-'){mask|=0X02;p++;}//是负数0010
 		if(*p==','||(*p=='*'))break;//遇到结束了
-		if(*p=='.'){mask|=0X01;p++;}//遇到小数点了
+		if(*p=='.'){mask|=0X01;p++;}//遇到小数点了0001
 		else if(*p>'9'||(*p<'0'))	//有非法字符
 		{	
 			ilen=0;
 			flen=0;
 			break;
 		}	
-		if(mask&0X01)flen++;
-		else ilen++;
+		if(mask&0X01)flen++;//小数点进if，小数点位数
+		else ilen++;//整数位数
 		p++;
 	}
 	if(mask&0X02)buf++;	//去掉负号
@@ -160,13 +160,37 @@ void NMEA_BDGSV_Analysis(nmea_msg *gpsx,u8 *buf)
 void NMEA_GNGGA_Analysis(nmea_msg *gpsx,u8 *buf)
 {
 	u8 *p1,dx;			 
-	u8 posx;    
+	u8 posx;  
+	u32 temp;  
 	p1=(u8*)strstr((const char *)buf,"$GNGGA");//地址
-	posx=NMEA_Comma_Pos(p1,6);								//得到GPS状态
-	if(posx!=0XFF)gpsx->gpssta=NMEA_Str2num(p1+posx,&dx);	
-	posx=NMEA_Comma_Pos(p1,7);								//得到用于定位的卫星数
-	if(posx!=0XFF)gpsx->posslnum=NMEA_Str2num(p1+posx,&dx); 
-	posx=NMEA_Comma_Pos(p1,9);								//得到海拔高度
+	posx=NMEA_Comma_Pos(p1,1);								//得到UTC时间
+	if(posx!=0XFF)
+	{
+		temp=NMEA_Str2num(p1+posx,&dx)/NMEA_Pow(10,dx);	 	//得到UTC时间,去掉ms
+		
+		gpsx->utc.hour=temp/10000;
+		if(gpsx->utc.hour<16)
+		{
+			gpsx->utc.hour=(temp/10000)+8;	
+		}
+		else 
+		{
+			gpsx->utc.hour=(temp/10000)-16;	
+		}
+		gpsx->utc.min=(temp/100)%100;
+		gpsx->utc.sec=temp%100;	 	 
+	}	
+	posx=NMEA_Comma_Pos(p1,2);							
+	if(posx!=0XFF)gpsx->latitude=NMEA_Str2num(p1+posx,&dx);	
+	posx=NMEA_Comma_Pos(p1,3);							
+	if(posx!=0XFF)gpsx->nshemi=*(p1+posx);	
+	posx=NMEA_Comma_Pos(p1,4);							
+	if(posx!=0XFF)gpsx->longitude=NMEA_Str2num(p1+posx,&dx);	
+	posx=NMEA_Comma_Pos(p1,5);							
+	if(posx!=0XFF)gpsx->ewhemi=*(p1+posx);	
+	posx=NMEA_Comma_Pos(p1,7);							
+	if(posx!=0XFF)gpsx->posslnum=NMEA_Str2num(p1+posx,&dx);  
+	posx=NMEA_Comma_Pos(p1,9);							
 	if(posx!=0XFF)gpsx->altitude=NMEA_Str2num(p1+posx,&dx);  
 }
 //分析GNGSA信息
@@ -211,7 +235,10 @@ void NMEA_GNRMC_Analysis(nmea_msg *gpsx,u8 *buf)
 		gpsx->utc.min=(temp/100)%100;
 		gpsx->utc.sec=temp%100;	 	 
 	}	
-	posx=NMEA_Comma_Pos(p1,3);								//得到纬度
+	
+	
+	posx=NMEA_Comma_Pos(p1,3);	//得到纬度$GNGGA,095528.000,2318.1133,N,11319.7210,E,1,06,3.7,55.1,M,5.4,M,,0000*69
+
 	if(posx!=0XFF)
 	{
 		temp=NMEA_Str2num(p1+posx,&dx);		 	 
@@ -219,6 +246,11 @@ void NMEA_GNRMC_Analysis(nmea_msg *gpsx,u8 *buf)
 		rs=temp%NMEA_Pow(10,dx+2);				//得到'		 
 		gpsx->latitude=gpsx->latitude*NMEA_Pow(10,5)+(rs*NMEA_Pow(10,5-dx))/60;//转换为° 
 	}
+	
+	
+	
+	
+	
 	posx=NMEA_Comma_Pos(p1,4);								//南纬还是北纬 
 	if(posx!=0XFF)gpsx->nshemi=*(p1+posx);					 
  	posx=NMEA_Comma_Pos(p1,5);								//得到经度

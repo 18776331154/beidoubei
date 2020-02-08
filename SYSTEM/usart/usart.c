@@ -103,10 +103,10 @@ void USART1_IRQHandler(void)
 		{ 
 			if(USART_RX_STA<USART1_MAX_RECV_LEN)	//还可以接收数据
 			{
-				TIM_SetCounter(TIM7,0);//计数器清空          				//计数器清空
+				TIM_SetCounter(TIM3,0);//计数器清空          				//计数器清空
 				if(USART_RX_STA==0) 				//使能定时器7的中断 
 				{
-					TIM_Cmd(TIM7,ENABLE);//使能定时器7
+					TIM_Cmd(TIM3,ENABLE);//使能定时器7
 				}
 				USART1_RX_BUF[USART_RX_STA++]=res;	//记录接收到的值	 
 			}else 
@@ -137,12 +137,7 @@ void uart_init(u32 bound){
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;//浮空输入
   GPIO_Init(GPIOA, &GPIO_InitStructure);//初始化GPIOA.10  
 
-  //Usart1 NVIC 配置
-  NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3 ;//抢占优先级3
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;		//子优先级3
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
-	NVIC_Init(&NVIC_InitStructure);	//根据指定的参数初始化VIC寄存器
+ 
   
    //USART 初始化设置
 
