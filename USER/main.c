@@ -32,11 +32,11 @@ void Gps_Msg_Show(void)
 				 
 		
 		tp=gpsx.longitude;	   
-		sprintf((char *)dtbuf,"%.8f%1c",tp/=100000,gpsx.ewhemi);	//得到经度字符串
+		sprintf((char *)dtbuf,"%.4f%1c",tp/=10000,gpsx.ewhemi);	//得到经度字符串
 		OLED_ShowString(8,2,dtbuf,16);
 		
 		tp=gpsx.latitude;	   
-		sprintf((char *)dtbuf,"%.8f%1c",tp/=100000,gpsx.nshemi);	//得到纬度字符串
+		sprintf((char *)dtbuf,"%.4f%1c",tp/=10000,gpsx.nshemi);	//得到纬度字符串
 		OLED_ShowString(8,4,dtbuf,16);
 		
 			 
@@ -68,7 +68,7 @@ int main(void)
 			USART_TX_BUF[i]=USART1_RX_BUF[i];		
  			USART_RX_STA=0;//启动下一次接收
 			USART_TX_BUF[i]=0;			//自动添加结束符
-//	    GPS_Analysis(&gpsx,(u8*)USART_TX_BUF);//分析字符串
+//	  GPS_Analysis(&gpsx,(u8*)USART_TX_BUF);//分析字符串
 			NMEA_GNGGA_Analysis(&gpsx,(u8*)USART_TX_BUF);
 			Gps_Msg_Show();				//显示信息
 			
